@@ -4,7 +4,6 @@ from django.conf import settings
 # Set OpenAI API Key from settings
 #openai.api_key = settings.OPENAI_API_KEY
 
-# chatbot/utils.py (Update get_chatbot_response function)
 def get_chatbot_response(user_message, conversation_history=[], system_message=None):
     try:
     # Default system message if none provided
