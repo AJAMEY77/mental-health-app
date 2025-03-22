@@ -23,5 +23,5 @@ urlpatterns = [
     path('api/chatbot/', include('chatbot.urls')),
     path('api/mood/', include('mood_tracker.urls')),
     path('api/resources/', include('resources.urls')),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/', include('accounts.urls')),
 ]
