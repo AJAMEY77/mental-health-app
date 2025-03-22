@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mood-dashboard">
+    <h2>Your Mood Tracker</h2>
+    
+    <div class="mood-chart">
+        {% if chart_image %}
+            <img src="data:image/png;base64,{{ chart_image }}" alt="Mood Chart">
+        {% else %}
+            <p>Not enough data to display chart. Start logging your mood to see trends.</p>
+        {% endif %}
+    </div>
+    
+    <div class="recent-moods">
+        <h3>Recent Mood Entries</h3>
+        <ul>
+            {% for entry in mood_entries %}
+            <li>
+                <span class="mood-date">{{ entry.timestamp|date:"M d, Y" }}</span>
+                <span class="mood-score">
+                    {% if entry.mood_score == 1 %}😞
+                    {% elif entry.mood_score == 2 %}😟
+                    {% elif entry.mood_score == 3 %}😐
+                    {% elif entry.mood_score == 4 %}🙂
+                    {% else %}😄
+                    {% endif %}
+                </span>
+                {% if entry.notes %}
+                <p class="mood-notes">{{ entry.notes }}</p>
+                {% endif %}
+            </li>
+            {% empty %}
+            <li>No mood entries yet</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

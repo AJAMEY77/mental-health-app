@@ -1,0 +1,41 @@
+<!-- templates/base.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Support App</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo" >MindfulChat</div>
+            <ul class="nav-links">
+                <li><a href="{% url 'chat' %}">Chat</a></li>
+                <li><a href="{% url 'mood_dashboard' %}">Mood Tracker</a></li>
+                <li><a href="{% url 'resources' %}">Resources</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'register' %}">Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer>
+        <p>Disclaimer: This app is not a substitute for professional mental health care.</p>
+        <p>If you're in crisis, please contact emergency services or a mental health helpline.</p>
+    </footer>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

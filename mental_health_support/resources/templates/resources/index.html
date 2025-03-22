@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="resources-container">
+    <h2>Mental Health Resources</h2>
+    
+    <div class="category-filter">
+        <button class="category-btn active" data-category="all">All</button>
+        <button class="category-btn" data-category="anxiety">Anxiety</button>
+        <button class="category-btn" data-category="depression">Depression</button>
+        <button class="category-btn" data-category="stress">Stress</button>
+        <button class="category-btn" data-category="general">General Wellbeing</button>
+        <button class="category-btn" data-category="crisis">Crisis Support</button>
+    </div>
+    
+    <div class="resources-list" id="resourcesList">
+        <!-- Resources will be loaded here -->
+    </div>
+    
+    <h2>Self-Help Exercises</h2>
+    <div class="exercises-list" id="exercisesList">
+        <!-- Exercises will be loaded here -->
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    const resourcesList = document.getElementById('resourcesList');
+    const exercisesList = document.getElementById('exercisesList');
+    
+    // Load resources initially
+    loadResources();
+    loadExercises();
+    
+    // Handle category filter buttons
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Update active button
+            categoryButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Get selected category
+            const category = this.getAttribute('data-category');
+            
+            // Reload resources and exercises
+            loadResources(category === 'all' ? null : category);
+            loadExercises(category === 'all' ? null : category);
+        });
+    });
+    
+    // Function to load resources
+    function loadResources(category = null) {
+        let url = '/api/resources/list/';
+        if (category) {
+            url += `?category=${category}`;
+        }
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                resourcesList.innerHTML = '';
+                
+                if (data.length === 0) {
+                    resourcesList.innerHTML = '<p>No resources found for this category.</p>';
+                    return;
+                }
+                
+                data.forEach(resource => {
+                    const resourceElement = document.createElement('div');
+                    resourceElement.classList.add('resource-item');
+                    
+                    resourceElement.innerHTML = `
+                        <h3>${resource.title}</h3>
+                        <p>${resource.description}</p>
+                        ${resource.url ? `<a href="${resource.url}" target="_blank">Learn More</a>` : ''}
+                        <span class="category-tag">${resource.category}</span>
+                    `;
+                    
+                    resourcesList.appendChild(resourceElement);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resourcesList.innerHTML = '<p>Error loading resources.</p>';
+            });
+    }
+    
+    // Function to load exercises
+    function loadExercises(category = null) {
+        let url = '/api/resources/self-help/';
+        if (category) {
+            url += `?category=${category}`;
+        }
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                exercisesList.innerHTML = '';
+                
+                if (data.length === 0) {
+                    exercisesList.innerHTML = '<p>No exercises found for this category.</p>';
+                    return;
+                }
+                
+                data.forEach(exercise => {
+                    const exerciseElement = document.createElement('div');
+                    exerciseElement.classList.add('exercise-item');
+                    
+                    exerciseElement.innerHTML = `
+                        <h3>${exercise.title}</h3>
+                        <p>${exercise.description}</p>
+                        <details>
+                            <summary>View Instructions</summary>
+                            <div class="exercise-instructions">
+                                ${exercise.instructions}
+                            </div>
+                        </details>
+                        <span class="category-tag">${exercise.category}</span>
+                    `;
+                    
+                    exercisesList.appendChild(exerciseElement);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                exercisesList.innerHTML = '<p>Error loading exercises.</p>';
+            });
+    }
+});
+</script>
+{% endblock %}
