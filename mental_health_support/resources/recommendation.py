@@ -39,28 +39,3 @@ def get_self_help_exercises(request):
         'instructions': e.instructions,
         'category': e.category
     } for e in exercises])
-
-# resources/views.py (Add new view)
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_recommendations(request):
-    from .recommendation import get_personalized_recommendations
-    
-    recommendation = get_personalized_recommendations(request.user)
-    
-    return Response({
-        'resources': [{
-            'id': r.id,
-            'title': r.title,
-            'description': r.description,
-            'url': r.url,
-            'category': r.category
-        } for r in recommendation['resources']],
-        'exercises': [{
-            'id': e.id,
-            'title': e.title,
-            'description': e.description,
-            'category': e.category
-        } for e in recommendation['exercises']],
-        'top_categories': recommendation['top_categories']
-    })

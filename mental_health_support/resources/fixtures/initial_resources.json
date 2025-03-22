@@ -1,0 +1,52 @@
+[
+  {
+    "model": "resources.resource",
+    "pk": 1,
+    "fields": {
+      "title": "National Suicide Prevention Lifeline",
+      "description": "24/7, free and confidential support for people in distress, prevention and crisis resources.",
+      "url": "https://suicidepreventionlifeline.org/",
+      "category": "crisis"
+    }
+  },
+  {
+    "model": "resources.resource",
+    "pk": 2,
+    "fields": {
+      "title": "Anxiety and Depression Association of America",
+      "description": "Information on prevention, treatment, and symptoms of anxiety, depression, and related conditions.",
+      "url": "https://adaa.org/",
+      "category": "anxiety"
+    }
+  },
+  {
+    "model": "resources.resource",
+    "pk": 3,
+    "fields": {
+      "title": "Mental Health America",
+      "description": "Promoting mental health for all Americans through education, research, and advocacy.",
+      "url": "https://www.mhanational.org/",
+      "category": "general"
+    }
+  },
+  {
+    "model": "resources.selfhelpexercise",
+    "pk": 1,
+    "fields": {
+      "title": "4-7-8 Breathing Technique",
+      "description": "A simple breathing exercise that can help reduce anxiety and promote relaxation.",
+      "instructions": "1. Sit comfortably with your back straight.\n2. Place the tip of your tongue against the ridge behind your upper front teeth.\n3. Exhale completely through your mouth, making a whoosh sound.\n4. Close your mouth and inhale quietly through your nose to a count of 4.\n5. Hold your breath for a count of 7.\n6. Exhale completely through your mouth, making a whoosh sound to a count of 8.\n7. Repeat the cycle three more times for a total of four breaths.",
+      "category": "anxiety"
+    }
+  },
+  {
+    "model": "resources.selfhelpexercise",
+    "pk": 2,
+    "fields": {
+      "title": "Gratitude Journaling",
+      "description": "Regular practice of writing down things you're grateful for can improve mood and well-being.",
+      "instructions": "1. Set aside 5-10 minutes each day, preferably in the morning or before bed.\n2. Write down 3-5 things you're grateful for that day. They can be big or small.\n3. Try to be specific and focus on people rather than things.\n4. Include why you're grateful for each item.\n5. Reflect on how these things make you feel.\n6. Review your entries periodically to remind yourself of the positive aspects of your life.",
+      "category": "depression"
+    }
+  }
+]
