@@ -4,41 +4,40 @@ from django.conf import settings
 # Set OpenAI API Key from settings
 #openai.api_key = settings.OPENAI_API_KEY
 
-def get_chatbot_response(user_message, conversation_history=[]):
+# chatbot/utils.py (Update get_chatbot_response function)
+def get_chatbot_response(user_message, conversation_history=[], system_message=None):
     try:
-        # Format conversation history (keeping last 5 exchanges for context)
+    # Default system message if none provided
+        if system_message is None:
+            system_message = "You are a supportive mental health assistant. Provide empathetic responses, coping strategies, and suggest professional help when appropriate. Never diagnose conditions."
+        
+        # Format conversation history for context
         formatted_history = []
-        for entry in conversation_history[-5:]:  
-            formatted_history.append({"role": "user", "content": entry.get("user_message", "")})
-            formatted_history.append({"role": "assistant", "content": entry.get("bot_response", "")})
-
-        # Add system prompt and user message
+        for entry in conversation_history[-5:]:  # Last 5 conversations for context
+            formatted_history.append({"role": "user", "content": entry.user_message})
+            formatted_history.append({"role": "assistant", "content": entry.bot_response})
+        
+        # Add current message
         messages = [
-            {"role": "system", "content": (
-                "You are a supportive mental health assistant. "
-                "Provide empathetic responses, coping strategies, "
-                "and suggest professional help when appropriate. "
-                "Never diagnose conditions."
-            )},
+            {"role": "system", "content": system_message},
             *formatted_history,
-            {"role": "user", "content": user_message[:500]}  # Limit input length
+            {"role": "user", "content": user_message}
         ]
-
-        # Generate response from OpenAI API
+        
         response = openai.ChatCompletion.create(
-            model=settings.OPENAI_MODEL,  # Fetch model dynamically from settings
+            model="gpt-4",  # Or your preferred model
             messages=messages,
             max_tokens=300,
             temperature=0.7
         )
-
-        return response.choices[0].message["content"]
-
+        
+        return response.choices[0].message['content']
     except openai.error.OpenAIError as e:
         return "Sorry, I'm experiencing technical difficulties. Please try again later."
     except Exception as e:
         return f"An unexpected error occurred: {str(e)}"
-    # chatbot/utils.py (Add to existing file)
+
+
 def analyze_message_for_concerns(message):
     """
     Detect potential mental health concerns based on keywords
