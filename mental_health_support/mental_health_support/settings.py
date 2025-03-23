@@ -9,30 +9,57 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+'''
 from pathlib import Path
 import os
-import environ
+from dotenv import load_dotenv
+load_dotenv()
 
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY','')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+APPEND_SLASH=False
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h$@#r#aa8prwhbeyb(qoghv%6xwax!&gg5tc3gqydjjrpf180k'
-
+#SECRET_KEY= 'django-insecure-h$@#r#aa8prwhbeyb(qoghv%6xwax!&gg5tc3gqydjjrpf180k'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-h$@#r#aa8prwhbeyb(qoghv%6xwax!&gg5tc3gqydjjrpf180k')
+DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#DJANGO_DEBUG= True
 
 ALLOWED_HOSTS = []
+'''
+import os
+from pathlib import Path
+from dotenv import load_dotenv
 
-env = environ.Env()
-environ.Env.read_env(env_file=Path(__file__).resolve().parent.parent / ".env")
-GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-h$@#r#aa8prwhbeyb(qoghv%6xwax!&gg5tc3gqydjjrpf180k')
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
+
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']  # Add these hosts
+
+# Keep APPEND_SLASH True for automatic URL trailing slash handling
+APPEND_SLASH = True
+#env = environ.Env()
+#environ.Env.read_env(env_file=Path(__file__).resolve().parent.parent / ".env")
+#GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
 # Application definition
+print("Api key:",GEMINI_API_KEY)
+print("Environment variables loaded:")
+print(f"GEMINI_API_KEY: {GEMINI_API_KEY}")
+print(f"DEBUG: {DEBUG}")
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -76,7 +103,9 @@ REST_FRAMEWORK = {
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR / 'templates',
+                 BASE_DIR / 'mood_tracker' / 'templates',
+                 ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

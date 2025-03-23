@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 @login_required(login_url='/accounts/login/')
 def log_mood(request):
+    
     if request.method != 'POST':
         return render(request, 'mood_tracker/dashboard.html')
     
@@ -41,9 +42,12 @@ def log_mood(request):
 
 @login_required
 def get_mood_chart(request):
+    
+    
     chart_data = generate_mood_chart(request.user)
     
     if not chart_data:
         return JsonResponse({'error': 'Not enough data to generate chart'}, status=404)
     
     return JsonResponse({'chart_image': chart_data})
+    
