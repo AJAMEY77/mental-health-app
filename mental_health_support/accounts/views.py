@@ -39,7 +39,7 @@ def user_login(request):
         else:
             messages.error(request, 'Invalid username or password.')
     # else:
-    #     form = AuthenticationForm()  # Allow GET requests by rendering the form
+        form = AuthenticationForm()  # Allow GET requests by rendering the form
     
     return render(request, 'accounts/login.html', {'form': form})
 

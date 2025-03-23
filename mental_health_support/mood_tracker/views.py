@@ -1,54 +1,49 @@
-from django.shortcuts import render
-
-# Create your views here.
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 from .models import MoodEntry
 from .utils import analyze_text_sentiment, generate_mood_chart
+from django.views.decorators.csrf import csrf_exempt
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@csrf_exempt
+@login_required(login_url='/accounts/login/')
 def log_mood(request):
-    # Direct mood entry
-    if 'mood_score' in request.data:
-        mood_score = int(request.data.get('mood_score'))
-        notes = request.data.get('notes', '')
-    # Text analysis for mood
-    elif 'text' in request.data:
-        text = request.data.get('text')
-        mood_score = analyze_text_sentiment(text)
-        notes = text
-    else:
-        return Response(
-            {'error': 'Either mood_score or text is required'},
-            status=status.HTTP_400_BAD_REQUEST
+    if request.method != 'POST':
+        return render(request, 'dashboard.html')
+    
+    if request.method == 'POST':
+        mood_score = None
+        notes = ''
+        
+        if 'mood_score' in request.POST:
+            mood_score = int(request.POST.get('mood_score'))
+            notes = request.POST.get('notes', '')
+        elif 'text' in request.POST:
+            text = request.POST.get('text')
+            mood_score = analyze_text_sentiment(text)
+            notes = text
+        else:
+            return JsonResponse({'error': 'Either mood_score or text is required'}, status=400)
+        
+        entry = MoodEntry.objects.create(
+            user=request.user,
+            mood_score=mood_score,
+            notes=notes
         )
+        
+        return JsonResponse({
+            'id': entry.id,
+            'mood_score': entry.mood_score,
+            'timestamp': entry.timestamp
+        })
     
-    # Save mood entry
-    entry = MoodEntry.objects.create(
-        user=request.user,
-        mood_score=mood_score,
-        notes=notes
-    )
-    
-    return Response({
-        'id': entry.id,
-        'mood_score': entry.mood_score,
-        'timestamp': entry.timestamp
-    })
+    return render(request, 'dashboard.html')
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@login_required
 def get_mood_chart(request):
     chart_data = generate_mood_chart(request.user)
     
     if not chart_data:
-        return Response({
-            'error': 'Not enough data to generate chart'
-        }, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse({'error': 'Not enough data to generate chart'}, status=404)
     
-    return Response({
-        'chart_image': chart_data
-    })
+    return JsonResponse({'chart_image': chart_data})
