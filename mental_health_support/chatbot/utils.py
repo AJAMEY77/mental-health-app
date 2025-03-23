@@ -1,73 +1,108 @@
 import google.generativeai as genai
 from django.conf import settings
 
-# Set Google Gemini API Key from settings
-genai.configure(api_key=settings.GEMINI_API_KEY)
-
 def get_chatbot_response(user_message, conversation_history=[], system_message=None):
     try:
+        # Configure API key
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+        
+        # Create the model
+        model = genai.GenerativeModel('models/gemini-2.0-flash-001')
+        
         # Default system message if none provided
         if system_message is None:
             system_message = (
                 "You are a supportive mental health assistant. Provide empathetic responses, "
                 "coping strategies, and suggest professional help when appropriate. Never diagnose conditions."
             )
-
+        
         # Format conversation history for context
         formatted_history = []
-        for entry in conversation_history[-5:]:  # Use the last 5 messages for context
+        history_to_use = conversation_history[:5]  # Take last 5 conversations
+        
+        for entry in history_to_use:
             formatted_history.append(f"User: {entry.user_message}")
             formatted_history.append(f"Assistant: {entry.bot_response}")
         
-        # Construct prompt for Gemini
-        prompt = f"{system_message}\n\n" + "\n".join(formatted_history) + f"\nUser: {user_message}\nAssistant:"
-
-        # Call Gemini API
-        response = genai.GenerativeModel("gemini-pro").generate_content(prompt)
-
-        # Extract AI response
+        # Construct prompt with context
+        prompt = f"""
+        {system_message}
+        
+        Previous conversation:
+        {chr(10).join(formatted_history) if formatted_history else 'No previous conversation'}
+        
+        Current conversation:
+        User: {user_message}
+        Assistant:"""
+        
+        # Generate response
+        response = model.generate_content(prompt)
+        
         if response and response.text:
             return response.text.strip()
-        else:
-            return "I'm here to help, but I couldn't generate a response. Please try again."
-    
+        return "I apologize, but I couldn't generate a response. Please try again."
+        
     except Exception as e:
-        return f"An unexpected error occurred: {str(e)}"
+        print(f"Error in get_chatbot_response: {str(e)}")
+        return f"I encountered an error: {str(e)}"
 
 def analyze_message_for_concerns(message):
     """
-    Detect potential mental health concerns based on keywords
+    Analyze message for potential mental health concerns
+    Returns dictionary with urgent flag and detected concerns
     """
-    # Dictionary of concern types and their keywords
-    concern_keywords = {
-        'anxiety': ['anxious', 'nervous', 'worry', 'panic', 'fear', 'stress', 'tense'],
-        'depression': ['sad', 'depressed', 'hopeless', 'empty', 'worthless', 'tired', 'exhausted'],
-        'suicidal': ['suicide', 'kill myself', 'end it all', 'better off dead', 'no reason to live'],
-    }
+    try:
+        # Configure API key
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+        
+        # Create model for analysis
+        model = genai.GenerativeModel('models/gemini-2.0-flash-001')
+        
+        # Analysis prompt
+        analysis_prompt = f"""
+        Analyze this message for mental health concerns. Look for:
+        1. Signs of crisis or emergency
+        2. Mental health symptoms
+        3. Level of distress
+        
+        Message: {message}
+        
+        Respond in JSON format:
+        {{
+            "urgent": true/false,
+            "concerns": ["concern1", "concern2"],
+            "severity": "low/medium/high"
+        }}
+        """
+        
+        # Get analysis
+        response = model.generate_content(analysis_prompt)
+        
+        if response and response.text:
+            analysis = response.text.strip()
+            
+            # If urgent concerns detected
+            if '"urgent": true' in analysis.lower():
+                return {
+                    'urgent': True,
+                    'concerns': ['crisis'],
+                    'response': (
+                        "I notice some concerning thoughts in your message. "
+                        "If you're having thoughts of self-harm or feeling unsafe, "
+                        "please reach out to emergency services or call the National "
+                        "Suicide Prevention Lifeline at 1-800-273-8255. They are "
+                        "available 24/7 to help."
+                    )
+                }
+            
+            return {
+                'urgent': False,
+                'concerns': ['general'],
+                'response': None
+            }
+            
+    except Exception as e:
+        print(f"Error in analyze_message_for_concerns: {str(e)}")
+        return None
 
-    message_lower = message.lower()
-    detected_concerns = []
-
-    # Check for each concern type
-    for concern, keywords in concern_keywords.items():
-        for keyword in keywords:
-            if keyword in message_lower:
-                detected_concerns.append(concern)
-                break
-
-    # Special handling for suicidal concerns
-    if 'suicidal' in detected_concerns:
-        return {
-            'urgent': True,
-            'concerns': detected_concerns,
-            'response': "I notice your message contains concerning language. If you're having thoughts of harming yourself, please contact a crisis helpline immediately. The National Suicide Prevention Lifeline is available 24/7 at 1-800-273-8255. Would you like me to provide additional resources?"
-        }
-
-    elif detected_concerns:
-        return {
-            'urgent': False,
-            'concerns': detected_concerns,
-            'response': None  # Let the AI generate a contextual response
-        }
-
-    return None  # No concerns detected
+    return None
