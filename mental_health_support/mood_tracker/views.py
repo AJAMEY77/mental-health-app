@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 @login_required(login_url='/accounts/login/')
 def log_mood(request):
     if request.method != 'POST':
-        return render(request, 'dashboard.html')
+        return render(request, 'mood_tracker/dashboard.html')
     
     if request.method == 'POST':
         mood_score = None

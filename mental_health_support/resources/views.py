@@ -21,7 +21,7 @@ def get_resources(request):
         'resources': resources
     }
     
-    return render(request, 'resources.html', context)
+    return render(request, 'resources/index.html', context)
 
 @login_required(login_url='/accounts/login/')
 def get_self_help_exercises(request):

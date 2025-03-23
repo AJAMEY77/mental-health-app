@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +29,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+env = environ.Env()
+environ.Env.read_env(env_file=Path(__file__).resolve().parent.parent / ".env")
+GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
 # Application definition
 
 INSTALLED_APPS = [
