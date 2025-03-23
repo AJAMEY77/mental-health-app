@@ -17,9 +17,12 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from resources.views import home  # Import the home view
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', home, name='home'),
     path('api/chatbot/', include('chatbot.urls')),
     path('api/mood/', include('mood_tracker.urls')),
     path('api/resources/', include('resources.urls')),

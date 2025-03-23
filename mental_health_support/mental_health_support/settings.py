@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'rest_framework',
+    'rest_framework.authtoken'
 ]
 
 External_app=["chatbot","mood_tracker","resources"]
@@ -57,6 +58,17 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'mental_health_support.urls'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
 
 TEMPLATES = [
     {
@@ -128,8 +140,10 @@ STATICFILES_DIRS = [
 ]
 
 # Authentication settings
-LOGIN_REDIRECT_URL = 'chat'
-LOGOUT_REDIRECT_URL = 'login'
+LOGIN_URL = "/accounts/login/"  # This ensures the login page is correctly referenced
+LOGIN_REDIRECT_URL = "/"  # Redirects users to home after login
+LOGOUT_REDIRECT_URL = "/accounts/login/"  # Redirects users to login after logout
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

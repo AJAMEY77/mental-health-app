@@ -7,7 +7,8 @@
     </div>
     
     <div class="chat-input">
-        <form id="chatForm">
+        <form id="chatForm" method="POST">
+            {% csrf_token %}
             <input type="text" id="userMessage" placeholder="Type your message here..." required>
             <button type="submit">Send</button>
         </form>
